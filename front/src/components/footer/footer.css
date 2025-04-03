@@ -1,0 +1,42 @@
+/**footer */
+footer{
+	background: #1c3b92;
+	color: white;
+	height:85vh;
+}
+footer .para{
+	flex: 1.45 1;
+    margin-left: 12vw;
+    line-height: 12vh;
+    margin-right: 2vw;
+}
+footer .row{
+	flex: 3;
+}
+footer .row, footer .col, footer .card{
+	background: #1c3b92;
+	color: white;
+}
+footer .card{
+	border: none;
+}
+footer .row{
+	margin: 0;
+}
+.card-body a{
+	display: block;
+	margin-bottom: 5vh;
+    text-decoration: none;
+	color: #cdc9c9;
+}
+.card-body a:hover{
+    text-decoration: underline;
+	color: white;
+}
+.bottom{
+	height: 13vh;
+	color: white;
+}
+@media (max-width:767px){
+	footer{	height:fit-content;}
+}

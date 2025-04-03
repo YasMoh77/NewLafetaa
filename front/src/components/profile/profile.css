@@ -1,0 +1,59 @@
+/* profile */
+.profile-cont{
+    min-height: 135vh;
+}
+.prof-head{
+    margin-right: .2vw !important;
+}
+.prof-head a{
+   color: white;
+}
+.profData-div{
+    min-height: 15vh;
+}
+.input-search-profile{
+    height: 8vh;
+    width: 40%;
+}
+
+/*edit in profile*/
+.head-edit{
+   /* background-color: #0a9e59;*/
+}
+.edit-form{
+    min-width: 55%;
+    background: white;
+    overflow-y: auto;
+    max-height: calc(100vh - 80px);
+}
+::-webkit-scrollbar{ 
+    border-radius: 1vw;
+}
+.edit-overlay{
+    overflow-y: auto;
+    height: calc(100% - 30px);
+    top: 35px;
+}
+
+/** optional fields */
+.input-cont-pro label{
+    flex: 1;
+}
+.input-cont-pro input,.input-cont-pro select{
+    flex: 6;
+}
+.input-cont-pro input{
+    border: 1px solid gray;
+}
+/** making ad pro(tameez) */
+.head-pro{
+    background-color: #e426a5;
+}
+/** search in profile */
+.main3{
+	border: 1px solid lightgray;
+	margin-bottom: 5vh;
+}
+.loadMoreBtn{
+    margin-bottom: 20vh;
+}

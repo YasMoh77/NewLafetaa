@@ -1,0 +1,55 @@
+
+/* admin  table for all ads and users */
+.table-ad-parent,.table-user-parent{
+    margin-bottom: 20vh;
+}
+.table-ad-parent:focus,.table-user-parent:focus{
+    outline: none !important;
+}
+.table-ad{
+    min-width:215vw;
+}
+@media (max-width: 1024px) {
+  .table-ad{min-width: 230vw;}
+}
+@media (max-width: 1000px) {
+    .table-ad{min-width: 250vw;}
+  }
+.table-ad img{
+    width:10vw;
+    height: 10vh;
+}
+.table-ad td,.table-user td{
+    border: 1px solid #d6e0f9;
+}
+::-webkit-scrollbar-track{ 
+    background-color: #f3f2f2;
+}
+::-webkit-scrollbar-thumb{ 
+    background-color: #d2cfcf;
+}
+/*main containers in dashboard*/
+.left-dash{
+    height: 90vh;
+}
+.right-dash .data{ 
+    height:30vh;
+}
+/** pagination */
+.pagination button{
+    border: 1px solid lightgray;
+    background-color: orange;
+    padding: 1vh 1vw;
+}
+
+/** edit comment */
+@media (max-width: 767px) {
+    i{font-size: 7vw;}
+  }
+  .mh-20{max-height: 20vh;}
+/*@media (min-width: 768px) {
+    .child-one-dash{width: 17.5%;}
+    .child-two-dash{width:80%}
+    .child-two-dash .show{width: 24%;}
+}
+*/

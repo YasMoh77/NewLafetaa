@@ -1,0 +1,21 @@
+.pass-div{
+    position: relative;
+}
+.bi-eye{
+    position: absolute;
+    top: 2vh;
+    left: 2vw;
+}
+.div-login-forget{
+    margin-right: 10vw;
+}
+.lbl-forget{
+    flex: 1.5;
+}
+.inp-forget{
+    flex: 3;
+}
+.form-add-forget{
+    padding: 10vh 1vw !important;
+    width: 55% !important;
+}

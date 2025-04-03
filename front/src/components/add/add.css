@@ -1,0 +1,10 @@
+.top-add{
+    min-height: 90vh;
+}
+.form-add,.form-add-forget{
+    background-color: #65e2e2;
+    margin: 10vh auto 15vh !important;
+    padding: 10vh 2vw ;
+    width: 60%;
+}
+

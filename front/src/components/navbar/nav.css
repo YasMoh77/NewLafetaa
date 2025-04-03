@@ -1,0 +1,31 @@
+/***navbar */
+.navbar{
+	height: 15vh;
+	/*background: var(--mainColor) !important;*/
+  box-shadow: 0px 2px 6px 4px #ededed;
+}
+.navbar-brand{
+	  color:  var(--mainColor);
+    font-size: 2.5vw;
+    font-weight: bold;
+    font-family: system-ui;
+}
+.navbar-brand:hover{
+  color:  var(--mainColor);
+}
+.navbar-nav{
+    margin: auto;
+}
+.navbar-nav li{
+	margin: 0 2vw;
+}
+.navbar-nav .nav-link,.navbar-nav .nav-link.active{
+	color:var(--textColor);
+	font-weight: bold;
+}
+  .bg-body-tertiary{
+    background-color: #fcfdfd !important;
+}
+.add-nav{
+  background-color: var(--textColor);
+}
