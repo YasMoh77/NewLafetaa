@@ -14,6 +14,8 @@ use App\Models\City;
 use App\Models\Plan;
 use App\Models\Comment;
 use App\Models\ReplyComment;
+use App\Models\Report;
+use App\Models\ReportCom;
 use App\Rules\countryPhone;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage; //put or delete files
@@ -120,12 +122,77 @@ class panelController extends Controller
         $found=User::where('id',$request->id);
         //update block if user was found
         if($found->first()){
-            if($found->first()->block==0){$found->update(['block'=>1]); return response()->json(['message'=>'User blocked', ]);
-            }else{$found->update(['block'=>0]); return response()->json(['message'=>'User blocking cancelled', ]);}    
+            if ($request->ads) {
+                //BLOCK ADS
+                //if not blocked, block user
+                if($found->first()->blockAds==0){
+                    $found->update(['blockAds'=>1]); return response()->json(['message'=>'User blocked', ]);
+                //if already blocked, unblock user
+                }else{
+                    $found->update(['blockAds'=>0]); return response()->json(['message'=>'User blocking cancelled', ]);
+                } 
+            }elseif($request->comms){
+                 //BLOCK COMMS
+                //if not blocked, block user
+                if($found->first()->blockComms==0){
+                    $found->update(['blockComms'=>1]); return response()->json(['message'=>'User blocked', ]);
+                //if already blocked, unblock user
+                }else{
+                    $found->update(['blockComms'=>0]); return response()->json(['message'=>'User blocking cancelled', ]);
+                } 
+            }elseif($request->reports){
+                //BLOCK REPORTS
+                //if not blocked, block user
+                if($found->first()->block==0){
+                    $found->update(['block'=>1]); return response()->json(['message'=>'User blocked', ]);
+                //if already blocked, unblock user
+                }else{
+                    $found->update(['block'=>0]); return response()->json(['message'=>'User blocking cancelled', ]);
+                }
+            }
+                
         }
         return response()->json([
             'message'=>'User NOT found'
         ]);  
+    }
+
+    //checkUserBlock
+    public function checkUserBlock(Request $request)
+    {   
+        $userID='';
+        if($request->email){
+           $foundUser=User::where('email',$request->email)->first();
+           if ($foundUser) {
+               $userID=$foundUser->id;
+           }
+        }
+        $id=$userID!==''?$userID:$request->id;
+        $block=User::where('id',$id);
+        if($block->first()){
+            //check if user is prevented from sending reports on ads&comments
+            if($request->more&&$request->more==='reports'){
+                return response()->json([
+                    'message'=>$block->first()->block,
+                    'more'=>'reports'
+                    ]);
+
+              //check if user is prevented from adding ads
+            }elseif($request->more&&$request->more==='ads'){
+                return response()->json([
+                    'message'=>$block->first()->blockAds,
+                    'more'=>'ads'
+                    ]);
+               //check if user is prevented from commenting
+            }elseif($request->more&&$request->more==='comms'){
+                return response()->json([
+                    'message'=>$block->first()->blockComms,
+                    'more'=>'comms'
+                    ]);
+            }
+        }else{
+            return response()->json(['message'=>'not found']);
+        }
     }
 
 
@@ -196,7 +263,7 @@ class panelController extends Controller
        return response()->json([ 'message'=>'Plan deleted' ]);
     }
 
-    //get comments
+    //get comments for all ads for dashboard
     public function comments(Request $request)
     {
         $page=$request->query('page',1);
@@ -227,7 +294,6 @@ class panelController extends Controller
             //update number of comments and rating in ads table
             Ad::where('item_id',$item_id)->update(['comments'=>$num,'rating'=>$rating]);
             return response()->json([ 'message'=>'Reply deleted' ]);
-        
         }
         //check if comment is there
         $found=Comment::where('c_id',$request->id);
@@ -285,10 +351,11 @@ class panelController extends Controller
             return response()->json(['comm'=>$comm->c_text]);
         }else{
             return response()->json([
-                'comm'=>'تم حذف التعليق الأصلي'
+                'comm'=>'تم حذف التعليق '
             ]);
         }
     }
+
 
     //get ad name
     public function getAdName(Request $request)
@@ -328,6 +395,47 @@ class panelController extends Controller
         }
          Comment::where('c_id',$request->id)->update(['c_text'=>$request->text]);
         return response()->json(['message' =>'تم التعديل']);
+    }
+
+
+    //get reports on ads
+    public function getAdReport(Request $request)
+    {
+        $page=$request->query('page',1);
+        $reports=Report::orderBy('id','DESC')->paginate(10,['*'],'page',$page);
+        return response()->json($reports);
+    }
+
+    //get reports on comments
+    public function getCommentReport(Request $request)
+    {
+        $page=$request->query('page',1);
+        $reports=ReportCom::orderBy('id','DESC')->paginate(10,['*'],'page',$page);
+        return response()->json($reports);
+    }
+
+    //deleteAdReport 
+    public function deleteAdReport(Request $request)
+    {
+        $found=Report::where('id',$request->id);
+        if($found->first()){
+           $found->delete();
+           return response()->json(['msg'=>'fake report & Fake Row deleted']);
+        }else{
+            return response()->json(['msg'=>'We didn\'t find this row']);
+        }
+    }
+
+    // delete Report on Comment
+    public function deleteCommentReport(Request $request)
+    {
+        $found=ReportCom::where('id',$request->id);
+        if($found->first()){
+           $found->delete();
+           return response()->json(['msg'=>'fake report & Fake Row deleted']);
+        }else{
+            return response()->json(['msg'=>'We didn\'t find this row']);
+        }
     }
 
 

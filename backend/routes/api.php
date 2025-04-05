@@ -33,10 +33,12 @@ Route::group(['prefix'=>'panel'],function(){
    Route::get('/users', [panelController::class,'users']);
    //block users
    Route::post('/block', [panelController::class,'block']);
+   //check if user has blocks 
+   Route::post('check-user-block',[panelController::class,'checkUserBlock']); 
    //change admin
    Route::post('/change-admin', [panelController::class,'changeAdmin']);
-   //delete user
-   Route::post('delete/{id}',[panelController::class,'destroy']); //delete certain user 
+   //delete certain user
+   Route::post('delete/{id}',[panelController::class,'destroy']);  
    //get user name
    Route::post('get-user-name/{id}',[panelController::class,'getUserName']); 
    //////////// country,state ...etc  ///////////////
@@ -58,6 +60,15 @@ Route::group(['prefix'=>'panel'],function(){
    Route::get('/replies', [panelController::class,'replies']);
    //get comment
    Route::post('/get-comment/{id}', [panelController::class,'getComment']);
+   //////////////////get reports///////////////////
+   //get reports on ads
+   Route::get('get-ad-reports',[panelController::class,'getAdReport']); 
+   //get reports on comments
+   Route::get('get-comment-reports',[panelController::class,'getCommentReport']); 
+   //delete  reports on ads
+   Route::post('delete-ad-report',[panelController::class,'deleteAdReport']); 
+   //delete  reports on comments
+   Route::post('delete-comment-report',[panelController::class,'deleteCommentReport']); 
 
 });
 
@@ -113,17 +124,25 @@ Route::group([],function () {
 
  //ads
  Route::group(['prefix'=>'ads'],function(){
-    //get certain user's ads to show them in their profile
+    //////////////ads/////////////////
+   //get certain user's ads to show them in their profile
     Route::post('/user',[apiAds::class,'userAds']);
+    //store ads
     Route::post('store',[apiAds::class,'store']); 
+    //get category
     Route::get('/cat/{cat}',[apiAds::class,'getCat']);
+    //get subcategory
     Route::get('/sub/{sub}',[apiAds::class,'getSub']);
     //update ads
     Route::post('update',[apiAds::class,'update']); //update certain ads
     //delete ads
-    Route::post('delete/{id}',[apiAds::class,'destroy']); //delete certain ads
-    //report ad
-    Route::post('report-ad',[apiAds::class,'reportAd']); //delete certain ads
+    Route::post('delete/{id}',[apiAds::class,'destroy']); 
+    //check if ad was reported
+    Route::post('report-ad',[apiAds::class,'reportAd']); 
+    
+    //check if user is blocked (to enable or prevent adding ads)
+    //Route::post('/if-user-blocked',[apiAds::class,'ifUserBlocked']);
+    
     //search certain user ads (in user profile)
     Route::post('/user-search',[apiAds::class,'userSearchAds']);
     //check if owner of the ad is the commentor
@@ -139,7 +158,7 @@ Route::group([],function () {
     Route::post('/check-comments/{id}',[apiAds::class,'checkComments']);
     //insert a new comment
     Route::post('/insert-comment',[apiAds::class,'insertComment']);
-    //bring ad comments
+    //bring comments for a certain ad to show on homepage
     Route::post('/comments/{id}',[apiAds::class,'getAddComments']);
     //update comments & rates
     Route::post('/update-comments-rates',[apiAds::class,'updateCommentsRates']);
@@ -153,8 +172,6 @@ Route::group([],function () {
     Route::post('/insert-like-comment',[apiAds::class,'insertLikeComment']);
     //report comment 
     Route::post('/report-comment',[apiAds::class,'reportComment']);
-    
-    
     
  });
 

@@ -52,7 +52,6 @@ class apiAds extends Controller
             'name'        => $request->user()->name,
             'email'       => $request->user()->email,
             'cont'        => $request->user()->cont,
-            'block'       => $request->user()->block,
             'admin'       => $request->user()->admin
            ]);
     }
@@ -225,7 +224,7 @@ class apiAds extends Controller
     }
 
     
-    //get comments for a certain ad
+    //get comments for a certain ad for homepage
     public function getAddComments(Request $request)
     {   
        $item=Comment::where('ITEM_ID',$request->id)->orderBy('c_id','DESC');
@@ -703,7 +702,6 @@ class apiAds extends Controller
        //check if ad was reported by this user before
        $foundRow=Report::where(['item_id'=>$request->item,'reporter'=>$user]);
        $now= Date('Y-m-d');
-       
        //if reported before, delete
        if($foundRow->first()){
            if($request->click){$foundRow->delete();}
@@ -731,10 +729,15 @@ class apiAds extends Controller
                 'email'=>$request->email
             ]);
        }
-       
-
-
     }
+
+    //check if User is Blocked
+    public function ifUserBlocked(Request $request)
+    {
+      
+    }
+
+    
 
 
 }
