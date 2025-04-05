@@ -37,12 +37,9 @@ const Profile = () => {
  const [startFav, setStartFav] = useState(false)
  const refBtnMoreFavourites = useRef('')
  const refBtnLoadMoreSearchInput = useRef('')
-
-
  
 //search
 const navigate=useNavigate();
-//const refsearchAdsInput=useRef()
 const [searchAdsInput, setSearchAdsInput] = useState([])
 const [msg, setMsg] = useState('')
 const [loading, setLoading] = useState(false)
@@ -57,7 +54,6 @@ const [loader, setLoader] = useState(false)
 const [currentPage, setCurrentPage] = useState(1)
 const [loadingMore, setLoadingMore] = useState(false)
 const [searchWord, setSearchWord] = useState('')
-//const refBtnMore = useRef('')
 const refBtnMoreInput = useRef('')
 const refBtnMoreSelect = useRef('')
 
@@ -65,6 +61,7 @@ const refBtnMoreSelect = useRef('')
 const [enlarge, setEnlarge] = useState('')
 const baseURLImg='http://127.0.0.1:8000/storage/images/';
 //edit form
+const [resultBlock, setResultBlock] = useState('')
 const [imgId, setImgId] = useState('')
 const [imgName, setImgName] = useState('')
 const [imgDesc, setImgDesc] = useState('')
@@ -326,13 +323,10 @@ const loadMoreAds=async()=>{
     //check if ad is saved or not
    const checkSavedStatus = async (itemIds, userEmail) => {
         try {
-        const res = await http.post('/checkSaved', { itemIds, userEmail });
-        // console.log(res.data.message)
-        return res.data.message; // Assuming it returns an object like { itemId1: 'saved', itemId2: 'not_saved', ... }
-        
+          const res = await http.post('/checkSaved', { itemIds, userEmail });
+          return res.data.message; // Assuming it returns an object like { itemId1: 'saved', itemId2: 'not_saved', ... }
         } catch (error) {
-        // console.error('Failed to check saved status', error);
-        return {};
+           return {};
         }
     };
 
@@ -353,7 +347,6 @@ const loadMoreAds=async()=>{
         }
         //store values
         setFavourites(res.data.data)
-        //console.log(res.data)
         setSearchFavourites([])
         setSearchAdsInput([]) 
         setUserAds([])
@@ -442,7 +435,6 @@ const insertComment=async(e,item,owner)=>{
         //send comment to backend
         const email=loginData.email
         const rate=rate5.current.style.color==='orange'?'5':(rate4.current.style.color==='orange')?'4':(rate3.current.style.color==='orange')?'3':(rate2.current.style.color==='orange')?'2':'1'
-        console.log(item,owner,rate)
         //send api
         const res=await http.post(`/ads/insert-comment`,{comment,item,owner,rate,email})
         //if comment was inserted
@@ -527,27 +519,13 @@ const editAd=async(e)=>{ //
   setImgName(e.NAME)
   setImgDesc(e.description2)
   setImgSrc(baseURLImg+e.photo)
-  setImgPhone('0'+e.phone)
+  setImgPhone(e.phone)
   setOptWhats(whatsCode(e.country_id,e.whatsapp.toString()))
   setOptWeb(e.website)
   setOptEmail(e.item_email)
   setOptYoutube(e.youtube)
   setCountryId(e.country_id)
-  console.log('it=',e)
-
-    /*setImgId(id)
-   setImgName(NAME)
-   setImgSrc(src)
-   //api  call
-   const res=await http.post('/fields',{id});
-   //store in states
-   setOptPhone(res.data.phone ? res.data.phone : '')
-   setOptWhats(res.data.whats ? res.data.whats : '')
-   setOptWeb(res.data.web ? res.data.web : '')
-   setOptEmail(res.data.email ? res.data.email : '')
-   setOptYoutube(res.data.youtube ? res.data.youtube : '')
-   setCountryId(res.data.country==1?'20':res.data.country==2?'9660':res.data.country==3?'9650':res.data.country==4?'9710':res.data.country==5?'9740':'9680')
-  */ document.querySelector('body').style.overflow='hidden';
+   document.querySelector('body').style.overflow='hidden';
   }
 
    const stopEditAd=()=>{
@@ -666,7 +644,6 @@ const showErrorDesc=(field,ref)=>{
                 // window.location.href='http://127.0.0.1:8000/api/receive/{data}';
                  navigate('/paypal')
                  window.location.reload()
-
               }else if(res.data.redirectVisa){
                 setResponseRocket('<p>visa</p>')
                 setLoadForm(false)
@@ -682,58 +659,62 @@ const showErrorDesc=(field,ref)=>{
 //submit form for updating
 const submitFormUpdateFunc = async (e) => {
       e.preventDefault();
-      //stop showing error message
-      setResponseError('')
-      setResponseOk('')
-      //values
-      const title = refTitle.current.value.trim()!==''?refTitle.current.value.trim():imgName;
-      const desc=refDesc.current.value.trim()!==''?refDesc.current.value.trim():imgDesc;
-      const id = parseInt(refId.current.value, 10);
-      const file = refFile.current.files[0];
-      const phoneInput=refPhone.current.value.trim()!==''?refPhone.current.value:imgPhone;
-      //additional values
-      const whatsInput=refWhats.current.value.trim();
-      const web=refWeb.current.value;
-      const emailSocial=refEmail.current.value;
-      const youtube=refYoutube.current.value;
-        //check if form values are valid
-        showErrorTitle(title,refTitle);
-        showErrorDesc(desc,refDesc);
-        showErrorPhone(phoneInput); 
-        showErrorWhats(whatsInput)       
-        // Create a FormData object
-        const formData = new FormData();
-        formData.append('title', title);
-        formData.append('desc', desc);
-        formData.append('file', file);
-        formData.append('email', email);
-        formData.append('phone', phoneInput);
-        formData.append('whats', whatsInput);
-        formData.append('web', web);
-        formData.append('emailSocial', emailSocial);
-        formData.append('youtube', youtube);
-        formData.append('id',id)
-        formData.append('cid',countryId)
-        //check if not all fields are empty
-        if( showErrorTitle(title,refTitle)==null && showErrorDesc(desc,refDesc)==null &&  showErrorPhone(phoneInput)==null && showErrorWhats(whatsInput)==null){
-        try {
-          setLoadForm(true);
-          const res = await http.post(`/ads/update`, formData);
-          // Return to normal
-          setLoadForm(false);
-          setResponseOk(res.data.message)
-          //close overlay and reload
-          setTimeout(() => {
-            stopEditAd();
-            window.location.reload();
-          }, 2000);
-        } catch (error) {
-          setLoadForm(false);
-          error.response ? setResponseError(error.response.data.errors) :setResponseError('');
+      if(resultBlock===0){ //user isnt blocked
+        //stop showing error message
+        setResponseError('')
+        setResponseOk('')
+        //values
+        const title = refTitle.current.value.trim()!==''?refTitle.current.value.trim():imgName;
+        const desc=refDesc.current.value.trim()!==''?refDesc.current.value.trim():imgDesc;
+        const id = parseInt(refId.current.value, 10);
+        const file = refFile.current.files[0];
+        const phoneInput=refPhone.current.value.trim()!==''?refPhone.current.value:imgPhone;
+        //additional values
+        const whatsInput=refWhats.current.value.trim();
+        const web=refWeb.current.value;
+        const emailSocial=refEmail.current.value;
+        const youtube=refYoutube.current.value;
+            //check if form values are valid
+            showErrorTitle(title,refTitle);
+            showErrorDesc(desc,refDesc);
+            showErrorPhone(phoneInput); 
+            showErrorWhats(whatsInput)       
+            // Create a FormData object
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('desc', desc);
+            formData.append('file', file);
+            formData.append('email', email);
+            formData.append('phone', phoneInput);
+            formData.append('whats', whatsInput);
+            formData.append('web', web);
+            formData.append('emailSocial', emailSocial);
+            formData.append('youtube', youtube);
+            formData.append('id',id)
+            formData.append('cid',countryId)
+            //check if not all fields are empty
+            if( showErrorTitle(title,refTitle)==null && showErrorDesc(desc,refDesc)==null &&  showErrorPhone(phoneInput)==null && showErrorWhats(whatsInput)==null){
+                try {
+                setLoadForm(true);
+                const res = await http.post(`/ads/update`, formData);
+                // Return to normal
+                setLoadForm(false);
+                setResponseOk(res.data.message)
+                //close overlay and reload
+                setTimeout(() => {
+                    stopEditAd();
+                    window.location.reload();
+                }, 2000);
+                } catch (error) {
+                setLoadForm(false);
+                error.response ? setResponseError(error.response.data.errors) :setResponseError('');
+                }
+        }else{
+        setResponseOk(<span className='red'>انتبه للأخطاء </span>)
         }
-     }else{
-      setResponseOk(<span className='red'>انتبه للأخطاء </span>)
-     }
+    }else{
+        alert('لا يمكنك اضافة لافتة لمخالفة شروط الموقع')
+    }
 };
 
 //get country code for whatsapp
@@ -771,10 +752,18 @@ const deleteFunc=async(id)=>{
      }
 }
 
+//check if user is prevented from adding ads
+const checkBlocking=async()=>{
+    const more='ads'
+    const res=await http.post('/panel/check-user-block',{email,more})
+    //res.data.message=0 means not blocked from adding ads
+    res.data.more==='ads'&&setResultBlock(res.data.message)
+}
 
 //show user's data on page load
 useEffect(() => {
     setProfileData(true)
+    checkBlocking()
 }, [])
 //////////////////////////////
 
@@ -1052,8 +1041,12 @@ useEffect(() => {
                                                         </div>
                                                         <div key={e.item_id}  className='d-flex justify-content-around mt-2'> 
                                                             {/* edit ad*/}
-                                                            {/* promote and display according to plan*/}
-                                                            <i title='تحرير' onClick={()=>{editAd(e)}} className='bi bi-wrench'></i>     
+                                                            {/* promote and display according to plan*/} 
+                                                            {resultBlock===0  //user not blocked
+                                                                ?<i title='تحرير'  onClick={()=>{editAd(e)}} className='bi bi-wrench'></i>
+                                                                :<i title='محظور للمخالفة' className='bi bi-wrench'></i>
+                                                            }
+                                                                 
                                                             {e.feature==2 && <i title='باقة ذهبية'    className="bi bi-rocket-takeoff-fill green"></i>}
                                                             {e.feature==1 && <i title='باقة فضية'  onClick={()=>{ tameezAd(e.item_id,e.NAME,baseURLImg+e.photo,e.feature)  }}  className="bi bi-rocket-takeoff-fill yellow"></i>}
                                                             {e.feature==0 && <i title='تمييز'  onClick={()=>{ tameezAd(e.item_id,e.NAME,baseURLImg+e.photo,e.feature)  }}  className="bi bi-rocket-takeoff"></i>}
@@ -1111,7 +1104,11 @@ useEffect(() => {
                                                                                                 
                                                                                     <div key={e.item_id} title={e.phone} className='d-flex justify-content-around mt-2'>
                                                                                         {/* edit ad*/}
-                                                                                        <i title='تحرير' onClick={()=>{editAd(e)}} className='bi bi-wrench'></i>
+                                                                                        {resultBlock===0  
+                                                                                            ?<i title='تحرير'  onClick={()=>{editAd(e)}} className='bi bi-wrench'></i>
+                                                                                            :<i title='محظور للمخالفة' className='bi bi-wrench'></i>
+                                                                                        }
+
                                                                                         {/* promote and display according to plan*/}
                                                                                         {e.feature==2 && <i title='باقة ذهبية'    className="bi bi-rocket-takeoff-fill green"></i>}
                                                                                         {e.feature==1 && <i title='باقة فضية'  onClick={()=>{ tameezAd(e.item_id,e.NAME,baseURLImg+e.photo,e.feature)  }}  className="bi bi-rocket-takeoff-fill yellow"></i>}
@@ -1171,7 +1168,11 @@ useEffect(() => {
                                                                                                                             
                                                                                                                 <div key={e.item_id} title={e.phone} className='d-flex justify-content-around mt-2'>
                                                                                                                         {/* edit ad*/}
-                                                                                                                        <i title='تحرير' onClick={()=>{editAd(e)}} className='bi bi-wrench'></i>
+                                                                                                                        {resultBlock===0  
+                                                                                                                            ?<i title='تحرير'  onClick={()=>{editAd(e)}} className='bi bi-wrench'></i>
+                                                                                                                            :<i title='محظور للمخالفة' className='bi bi-wrench'></i>
+                                                                                                                        }
+
                                                                                                                         {/* promote and display according to plan*/}
                                                                                                                         {e.feature==2 && <i title='باقة ذهبية'    className="bi bi-rocket-takeoff-fill green"></i>}
                                                                                                                         {e.feature==1 && <i title='باقة فضية'  onClick={()=>{ tameezAd(e.item_id,e.NAME,baseURLImg+e.photo,e.feature)  }}  className="bi bi-rocket-takeoff-fill yellow"></i>}

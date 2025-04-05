@@ -15,8 +15,8 @@ const Footer = () => {
                         <div className="card-body">
                         <h5 className="card-title mb-4"> معلومات عنا</h5>
                         <Link to='/' className="card-text">الرئيسية </Link>
-                        <Link to='/' className="card-text">سؤال وجواب </Link>
-                        <Link to='/' className="card-text"> أضف لافتة </Link>
+                        <Link to='/faq' className="card-text">سؤال وجواب </Link>
+                        <Link to='/add' className="card-text"> أضف لافتة </Link>
                         </div>
                     </div>
                     </div>
@@ -24,9 +24,9 @@ const Footer = () => {
                     <div className="card h-100">
                         <div className="card-body">
                             <h5 className="card-title mb-4"> لافتــة</h5>
-                            <Link to='/' className="card-text">المدونة </Link>
-                            <Link to='/' className="card-text"> سياسة الخصوصية </Link>
-                            <Link to='/' className="card-text">الشروط والأحكام </Link>
+                            <Link to='/blog' className="card-text">المدونة </Link>
+                            <Link to='/privacy' className="card-text"> سياسة الخصوصية </Link>
+                            <Link to='/terms' className="card-text">الشروط والأحكام </Link>
                         </div>
                     </div>
                     </div>
@@ -34,9 +34,9 @@ const Footer = () => {
                     <div className="card h-100">
                         <div className="card-body">
                             <h5 className="card-title mb-4"> المزيد</h5>
-                            <Link to='/' className="card-text"> وظائف </Link>
-                            <Link to='/' className="card-text"> اربح معنا </Link>
-                            <Link to='/' className="card-text"> اتصل بنا </Link>
+                            <Link to='/jobs' className="card-text"> وظائف </Link>
+                            <Link to='/win' className="card-text"> اربح معنا </Link>
+                            <Link to='/contact-us' className="card-text"> اتصل بنا </Link>
                         </div>
                     </div>
                     </div>

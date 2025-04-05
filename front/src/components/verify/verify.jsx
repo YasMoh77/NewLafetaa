@@ -10,22 +10,19 @@ const Verify = () => {
     const nameRegister=JSON.parse(localStorage.getItem('nameRegister'));
     const emailRegister=JSON.parse(localStorage.getItem('emailRegister'));
     const loginData=JSON.parse(localStorage.getItem('loginData'));
-
+   
     const [load, setLoad] = useState(false)
     const [result, setResult] = useState('')
     const navigate=useNavigate();
 
     //send email verification again
     const sendVerifyMsgAgain=async()=>{
-
         if(nameRegister&& emailRegister){
             //hide message and start spinner
             setResult('')
             setLoad(true)
-            console.log(nameRegister,emailRegister)
             //go to verify in backend
             const res= await http.post('/send-verify',{nameRegister,emailRegister});
-             console.log(res.data)
             //show message and stop spinner
             setResult(res.data.message)
             setLoad(false)

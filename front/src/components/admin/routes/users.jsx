@@ -1,19 +1,14 @@
-import { useEffect,useState,useRef } from 'react'
+import { useEffect,useState } from 'react'
 import { useNavigate } from 'react-router'
 import axios  from 'axios'
 import {http} from '../../axios/axiosGlobal' 
 import Pagination  from '../pagination'
+import CheckUserBlock from '../../helpers/CheckUserBlock'
 import   '../admin.css'
 
-const Users = ({hideFunc}) => {
-    //receive hideFunc as a prop, load it with hide whose value is 1
-    //to go back to dashboard and hide its contents
-    //const hide=1;
-    hideFunc(1)
-
+const Users = () => {
      //get login data
      const loginData=JSON.parse(localStorage.getItem('loginData'));
-
     const navigate=useNavigate();
     //states
     const [users, setUsers] = useState(null)
@@ -113,7 +108,9 @@ const Users = ({hideFunc}) => {
                             <td>Email</td>
                             <td>Email verified at</td>
                             <td>Admin</td>      
-                            <td>Blocked</td>                                                  
+                            <td>Block report</td>    
+                            <td>Block ads</td>  
+                            <td>Block comments</td>                                                  
                             {loginData.admin ==='sup'||loginData.admin ==='own' &&    //only super admin or owner can do actions                      
                             <td>Action</td> 
                             }                      
@@ -128,14 +125,18 @@ const Users = ({hideFunc}) => {
                             <td>{e.email}</td>
                             <td>{e.email_verified_at}</td>
                             <td className='w-fit'><span className='text-success'>{e.admin=='ok'?'admin':e.admin=='sup'?'superAdmin':e.admin=='own'?'Owner':''}</span></td>  
-                            <td>{e.block==1 ? <span className='red'>blocked</span> : ''} </td>                                                   
+                            <td>{e.block==1 && <span className='red'>blocked</span>} </td>
+                            <td>{e.blockAds==1 && <span className='red'>blocked</span>} </td>
+                            <td>{e.blockComms==1 && <span className='red'>blocked</span>} </td>                                                   
                             {loginData.admin ==='sup'||loginData.admin ==='own' && // action ONLY allowed for super admins
-                            (<td>
-                                {/* block user */}
-                               {e.block==1 ? <i title='cancel blocking' className='bi bi-lock me-5 p-1 bg-danger text-light' onClick={()=>{cancelBlock(e.id,e.block)}} ></i> : <i title='block' className='bi bi-unlock me-5 p-1 bg-success text-light' onClick={()=>{block(e.id,e.block)}} ></i> }                       
-                               {/* delete user */}
-                               <i title='delete' onClick={()=>{deleteItem(e.id)}} className='bi bi-trash me-5 bg-danger text-light p-1'></i>
-                                {/* promote user */}
+                            (<td className='d-flex justify-content-between'>
+                               {/* block user */}
+                               <CheckUserBlock id={e.id} more={'reports'} />
+                               <CheckUserBlock id={e.id} more={'ads'} />
+                               <CheckUserBlock id={e.id} more={'comms'} />
+                                  {/* delete user */}
+                               <i title='delete' onClick={()=>{deleteItem(e.id)}} className='bi bi-trash me-2 bg-danger text-light p-1'></i>
+                                  {/* promote user */}
                                 <select  onChange={(ee)=>{adminFunc(ee.target.value,e.id)}}>
                                     <option value='0'>make</option>
                                     {e.admin=='' ? <option selected value='1'>User</option> : <option value='1'>User</option>}

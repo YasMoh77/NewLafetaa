@@ -76,10 +76,9 @@ const Login = () => {
                       // store only user name and email 
                       const name=res2.data.name;
                       const email=res2.data.email;
-                      const country=res2.data.cont//user's country
-                      const block=res2.data.block
+                      const country=res2.data.cont //user's country
                       const admin=res2.data.admin
-                      const user={name,email,country,block,admin}
+                      const user={name,email,country,admin}
                       //store name and email in localStorage
                       localStorage.setItem('loginData',JSON.stringify(user))
                       //show response & stop spinner after response

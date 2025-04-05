@@ -6,11 +6,9 @@ import Pagination  from '../pagination'
 import axios from 'axios';
 import  '../admin.css'
 
-const Requests = ({hideFunc}) => {
+const Requests = () => {
     //receive hideFunc as a prop, load it with hide whose value is 1
    //to go back to dashboard and hide its contents
-   const hide=1;
-   hideFunc(hide)
    //get login data
    const loginData=JSON.parse(localStorage.getItem('loginData'));
    const navigate=useNavigate();

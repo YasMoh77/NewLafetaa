@@ -1,3 +1,4 @@
+/*
 import React,{useState, useEffect} from 'react'
 import { useSearchParams,Link } from 'react-router-dom'
 import GetCatSubcat from '../helpers/catSubcat';
@@ -147,7 +148,7 @@ const loadMore=async()=>{
       
         
         <div className='fullheight'>
-          {/* enlarge images*/}
+          {/* enlarge images*
           {enlarge && 
              <div className="overlay">
                 <img src={enlarge}  alt="k" /> <i onClick={stopEnlargeFun} className="close-btn bi bi-x-square" ></i>
@@ -197,3 +198,4 @@ const loadMore=async()=>{
 }
 
 export default More
+*/

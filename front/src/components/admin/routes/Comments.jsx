@@ -5,7 +5,7 @@ import Pagination from '../pagination'
 import GetUserName from '../../helpers/getUserName'
 import GetAdName from '../../helpers/getAdName'
 import { Modal, Button } from "react-bootstrap";
-import { http, http5 } from '../../axios/axiosGlobal'
+import { http5 } from '../../axios/axiosGlobal'
 
 
 const Comments = () => {
@@ -36,9 +36,9 @@ const Comments = () => {
 
  //mark row
  const markRow=(ee)=>{
-    //if( ee.parentElement.style.backgroundColor=='orange'){
-      //  ee.parentElement.style.backgroundColor='white';
-    //}else{ ee.parentElement.style.backgroundColor='orange' }
+    if( ee.parentElement.style.backgroundColor=='orange'){
+        ee.parentElement.style.backgroundColor='white';
+    }else{ ee.parentElement.style.backgroundColor='orange' }
   }
 
   //when pagination number is clicked change currentPage

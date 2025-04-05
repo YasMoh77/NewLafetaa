@@ -3,7 +3,7 @@ import { http } from '../axios/axiosGlobal'
 
 const CheckReportAd = ({item,email}) => {
     const [showReportAd, setShowReportAd] = useState({})
-    //
+    //check if ad was reported
     const getReport=async(item,email)=>{
         const res=await http.post(`/ads/report-ad`,{item,email})
         setShowReportAd({ok:res.data.ok,item:res.data.item,email:res.data.email})

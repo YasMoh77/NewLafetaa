@@ -1,12 +1,13 @@
 import {useState,useEffect,useRef } from 'react'
 import { useNavigate } from 'react-router'
-import { http,httpFile } from '../axios/axiosGlobal'
+import { http,http5,httpFile } from '../axios/axiosGlobal'
 import './add.css'
 
 const Add = () => {
     const loginData=JSON.parse(localStorage.getItem('loginData'));
     const email= loginData && loginData.email;//means user already signed in
     //values
+    const [resultBlock, setResultBlock] = useState('')
     const [cats, setCats] = useState([])
     const [subCats, setSubCats] = useState([])
     const [conts, setConts] = useState([])
@@ -116,60 +117,72 @@ const Add = () => {
 
     //submit add
     const submitAddFunc=async(e)=>{
-         e.preventDefault();
-        //get values from form
-        const titleValue=title.current.value.trim();
-        const descValue=desc.current.value.trim();
-        const catValue=cat.current.value;
-        const subValue=sub.current.value;
-        const countryValue=country.current.value;
-        const stateValue=state.current.value;
-        const cityValue=city.current.value;  
-        const phone=refPhone.current.value; //
-        const photoValue=photo.current.files[0];
-        //additional values
-        const whats=refWhats.current.value;
-        const web=refWeb.current.value;
-        const emailSocial=refEmail.current.value;
-        const youtube=refYoutube.current.value;
-        //check if form values are valid
-        showErrorTitle(titleValue,title);
-        showErrorDesc(descValue,desc)
-        showError(catValue,'',cat);
-        showError(subValue,'',sub);
-        showError(countryValue,'',country);
-        showError(stateValue,'',state);
-        showError(cityValue,'',city);
-        showErrorPhone(phone);
-        showErrorWhats(whats)
-        showError(photoValue,null,photo);
-        //store values
-        const postData={titleValue,descValue,catValue,subValue,countryValue,stateValue,cityValue,photoValue,email,phone,whats,web,emailSocial,youtube}
-        //send values to backend
-        if(showErrorTitle(titleValue,title)==null && showErrorDesc(descValue,desc)==null  && catValue>0 && subValue>0 && countryValue>0 && stateValue>0  && cityValue>0 && showErrorPhone(phone)==null &&showErrorWhats(whats)==null && email && photoValue!=null ){
-            try{
-                setResponseOk('')
-                setResponseError('')
-                setLoadingAdd(true);
-              const res= await httpFile.post('/ads/store',postData);
-                 //store response
-                setResponseOk(res.data.msg)
-                setLoadingAdd(false)
-                setTimeout(() => {
-                   navigate('/');
-                }, 2000);
-            }catch (error) {
-                setLoadingAdd(false)
-                error.response ? setResponseError(error.response.data.errors) :setResponseError('');
-            } //end catch
-        }else{ //end if
-            setResponseOk(<small className='red'> هناك أخطاء بالحقول المشار اليها أعلاه</small>)
+        e.preventDefault();
+        if(resultBlock===0){ //this user is not prevented from adding ads
+            //get values from form
+            const titleValue=title.current.value.trim();
+            const descValue=desc.current.value.trim();
+            const catValue=cat.current.value;
+            const subValue=sub.current.value;
+            const countryValue=country.current.value;
+            const stateValue=state.current.value;
+            const cityValue=city.current.value;  
+            const phone=refPhone.current.value; //
+            const photoValue=photo.current.files[0];
+            //additional values
+            const whats=refWhats.current.value;
+            const web=refWeb.current.value;
+            const emailSocial=refEmail.current.value;
+            const youtube=refYoutube.current.value;
+            //check if form values are valid
+            showErrorTitle(titleValue,title);
+            showErrorDesc(descValue,desc)
+            showError(catValue,'',cat);
+            showError(subValue,'',sub);
+            showError(countryValue,'',country);
+            showError(stateValue,'',state);
+            showError(cityValue,'',city);
+            showErrorPhone(phone);
+            showErrorWhats(whats)
+            showError(photoValue,null,photo);
+            //store values
+            const postData={titleValue,descValue,catValue,subValue,countryValue,stateValue,cityValue,photoValue,email,phone,whats,web,emailSocial,youtube}
+            //send values to backend
+            if(showErrorTitle(titleValue,title)==null && showErrorDesc(descValue,desc)==null  && catValue>0 && subValue>0 && countryValue>0 && stateValue>0  && cityValue>0 && showErrorPhone(phone)==null &&showErrorWhats(whats)==null && email && photoValue!=null ){
+                try{ alert('good')
+                    setResponseOk('')
+                    setResponseError('')
+                    setLoadingAdd(true);
+                const res= await httpFile.post('/ads/store',postData);
+                    //store response
+                    setResponseOk(res.data.msg)
+                    setLoadingAdd(false)
+                    setTimeout(() => {
+                    navigate('/');
+                    }, 2000);
+                }catch (error) {
+                    setLoadingAdd(false)
+                    error.response ? setResponseError(error.response.data.errors) :setResponseError('');
+                } //end catch
+            }else{ //end if
+                setResponseOk(<small className='red'> هناك أخطاء بالحقول المشار اليها أعلاه</small>)
+            }
+        }else{
+           alert('لا يمكنك اضافة لافتة لمخالفة شروط الموقع')
         }
     }//end submitAddFunc
-   
+     
+    //check if user is prevented from adding ads
+    const checkBlocking=async()=>{
+        const more='ads'
+        const res=await http5.post('/panel/check-user-block',{email,more})
+        //res.data.message=0 means not blocked from adding ads
+        res.data.more==='ads'&&setResultBlock(res.data.message)
+    }
 
      useEffect(() => {
          !email&& navigate('/login')
+         checkBlocking()
      }, [email])
 
    

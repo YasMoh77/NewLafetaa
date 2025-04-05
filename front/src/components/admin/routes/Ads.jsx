@@ -5,14 +5,14 @@ import {http,http4} from '../../axios/axiosGlobal'
 import Pagination  from '../pagination'
 import axios  from 'axios'
 import { debounce } from 'lodash';
+import CheckUserBlock from '../../helpers/CheckUserBlock'
 import   '../admin.css'
 
-const Ads = ({hideFunc}) => {
+const Ads = () => {
    
   //receive hideFunc as a prop, load it with hide whose value is 1
   //to go back to dashboard and hide its contents
-   const hide=1;
-   hideFunc(hide)
+//   hideFunc(1)
 
     //store pagination values
      const [ads, setAds] = useState([])
@@ -120,6 +120,7 @@ const Ads = ({hideFunc}) => {
                     userName:userNames[ad.USER_ID]
                 }));
                 setAds(adsWithNames)
+                //console.log('ss',)
           }
          
           setCurrentPage(res.data.current_page)
@@ -611,15 +612,16 @@ const Ads = ({hideFunc}) => {
                             <td>{e.plan_until}</td>
                             <td>{e.userName}</td>
                             
-                            {loginData.admin ==='sup'||loginData.admin ==='own' && // action ONLY allowed for super admins
+                            {loginData.admin ==='sup'||loginData.admin ==='own' && // action ONLY allowed for super admins 
                             (<td>
-                                <i title='تحرير' className='bi bi-wrench me-5 p-1 bg-info text-light' onClick={()=>{editAd(e)}} ></i>                      
+                                <i title='تحرير' className='bi bi-wrench me-3 p-1 bg-info text-light' onClick={()=>{editAd(e)}} ></i>                      
                                 {/* promote and display according to plan*/}
-                                {e.feature==2 && <i title='باقة ذهبية'  onClick={()=>{ tameezAd(e.item_id,e.NAME,baseURLImg+e.photo,e.feature)  }}  className="bi bi-rocket-takeoff-fill p-1 bg-success text-light me-5"></i>}
-                                {e.feature==1 && <i title='باقة فضية'  onClick={()=>{ tameezAd(e.item_id,e.NAME,baseURLImg+e.photo,e.feature)  }}  className="bi bi-rocket-takeoff-fill me-5 bg-yellow text-light p-1 "></i>}
-                                {e.feature==0 && <i title='تمييز'  onClick={()=>{ tameezAd(e.item_id,e.NAME,baseURLImg+e.photo,e.feature)  }}  className="bi bi-rocket-takeoff me-5 bg-secondary text-light p-1"></i>}
+                                {e.feature==2 && <i title='باقة ذهبية'  onClick={()=>{ tameezAd(e.item_id,e.NAME,baseURLImg+e.photo,e.feature)  }}  className="bi bi-rocket-takeoff-fill p-1 bg-success text-light me-3"></i>}
+                                {e.feature==1 && <i title='باقة فضية'  onClick={()=>{ tameezAd(e.item_id,e.NAME,baseURLImg+e.photo,e.feature)  }}  className="bi bi-rocket-takeoff-fill me-3 bg-yellow text-light p-1 "></i>}
+                                {e.feature==0 && <i title='تمييز'  onClick={()=>{ tameezAd(e.item_id,e.NAME,baseURLImg+e.photo,e.feature)  }}  className="bi bi-rocket-takeoff me-3 bg-secondary text-light p-1"></i>}
                                 {/* delete ad*/}
-                                <i title='حذف' onClick={()=>{deleteItem(e.item_id)}} className='bi bi-trash bg-danger text-light p-1'></i>
+                                <i title='حذف' onClick={()=>{deleteItem(e.item_id)}} className='bi bi-trash me-3 bg-danger text-light p-1'></i>
+                                <CheckUserBlock id={e.USER_ID} more={'ads'} />
                             </td>)}
                                                                                
                         </tr>

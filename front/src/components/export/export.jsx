@@ -1,6 +1,12 @@
 import Nav from '../navbar/nav'
 import About from '../more/about'
 import Faq from '../more/faq'
+import Privacy from '../more/privacy'
+import Terms from '../more/terms'
+import Contact from '../more/contact'
+import Jobs from '../more/jobs'
+import Win from '../more/win'
+import Blog from '../more/blog'
 import Show from '../show/show'
 import More from '../more/more'
 import Register from '../register/register'
@@ -26,7 +32,7 @@ import Footer from '../footer/footer'
 
 const Exports=
 {
-    Nav,About,Faq,More,Show,Register,Verify,Verified,Login,RequestReset,Forgetpassword,Profile,
+    Nav,About,Faq,Privacy,Terms,Contact,Jobs,Win,Blog,More,Show,Register,Verify,Verified,Login,RequestReset,Forgetpassword,Profile,
     Add,Dashboard,CPanel,Paypal,SuccessPay,SuccessPayExternal,CancelPay,Footer
 }
 

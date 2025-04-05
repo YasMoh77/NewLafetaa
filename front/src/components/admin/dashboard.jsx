@@ -6,6 +6,8 @@ import Users from './routes/users'
 import Requests from './routes/requests'
 import Comments from './routes/Comments'
 import RepliesComments from './routes/RepliesComments'
+import Reports from './routes/reportAds'
+import ReportsComms from './routes/reportComments'
 import Notes from './routes/notes'
 import   './admin.css'
 import { http } from '../axios/axiosGlobal'
@@ -33,8 +35,8 @@ const  Dashboard=()=> {
     }
     
     //send hideFunc to ads and users to hide dasboard contents
-    const hideFunc=(hide)=>{
-        setHide(hide)
+    const hideFunc=()=>{
+        setHide(1)
     }
     const showDashGraphs=(val)=>{
         if (val===0&&location.pathname==='/dashboard') {
@@ -62,12 +64,16 @@ const  Dashboard=()=> {
                     <div className='left-dash col-2 bg-dark me-1'>
                         <ul className='list-unstyled py-4'>
                             <li className='pb-2'><Link onClick={()=>{showDashGraphs(0)}} to='/dashboard'>Dashboard</Link></li>
-                            <li className='pb-2'><Link onClick={()=>{showDashGraphs(1)}} to='ads'>Ads</Link></li>
-                            <li className='pb-2'><Link onClick={()=>{showDashGraphs(1)}} to='users'>Users</Link></li>
-                            <li className='pb-2'><Link onClick={()=>{showDashGraphs(1)}} to='requests'>Plan requests</Link></li>
-                            <li className='pb-2'><Link onClick={()=>{showDashGraphs(1)}} to='comments'>Comments</Link></li>
-                            <li className='pb-2'><Link onClick={()=>{showDashGraphs(1)}} to='reply-comments'>Replies to Comments</Link></li>
-                            <li className='pb-2'><Link onClick={()=>{showDashGraphs(1)}} to='notes'>Notes</Link></li>
+                            <li className='pb-2'><Link onClick={()=>{showDashGraphs(1)}} to='/dashboard/ads'>Ads</Link></li>
+                            <li className='pb-2'><Link onClick={()=>{showDashGraphs(1)}} to='/dashboard/users'>Users</Link></li>
+                            <li className='pb-2'><Link onClick={()=>{showDashGraphs(1)}} to='/dashboard/requests'>Plan requests</Link></li>
+                            <li className='pb-2'><Link onClick={()=>{showDashGraphs(1)}} to='/dashboard/comments'>Comments</Link></li>
+                            <li className='pb-2'><Link onClick={()=>{showDashGraphs(1)}} to='/dashboard/reply-comments'>Replies to Comments</Link></li>
+                            <li className='pb-2'><Link onClick={()=>{showDashGraphs(1)}} to='/dashboard/reports'>Reports on ads</Link></li>
+                            <li className='pb-2'><Link onClick={()=>{showDashGraphs(1)}} to='/dashboard/reports-comms'>Reports on comments</Link></li>
+
+
+                            <li className='pb-2'><Link onClick={()=>{showDashGraphs(1)}} to='/dashboard/notes'>Notes</Link></li>
                         </ul>
                     </div>
 
@@ -75,12 +81,14 @@ const  Dashboard=()=> {
                     <div className='right-dash col-9  me-1'>
                         <div className='row h-100 justify-content-between '>
                             <Routes>
-                               <Route path='ads'  element={<Ads hideFunc={hideFunc}/>} />
-                               <Route path='users'  element={<Users hideFunc={hideFunc} />} />
-                               <Route path='requests'  element={<Requests hideFunc={hideFunc} />} />
-                               <Route path='comments'  element={<Comments hideFunc={hideFunc} />} />
-                               <Route path='reply-comments'  element={<RepliesComments hideFunc={hideFunc} />} />
-                               <Route path='notes'  element={<Notes hideFunc={hideFunc} />} />
+                               <Route path='ads'  element={<Ads />} />
+                               <Route path='users'  element={<Users />} />
+                               <Route path='requests'  element={<Requests />} />
+                               <Route path='comments'  element={<Comments />} />
+                               <Route path='reply-comments'  element={<RepliesComments />} />
+                               <Route path='reports'  element={<Reports />} />
+                               <Route path='reports-comms'  element={<ReportsComms />} />
+                               <Route path='notes'  element={<Notes />} />
                             </Routes>
                             {!hide && 
                             <div className='data d-flex justify-content-between p-0'>

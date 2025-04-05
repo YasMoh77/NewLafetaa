@@ -10,7 +10,7 @@ import GetStars from '../helpers/GetStars';
 import NumOfReplies from '../helpers/NumOfReplies';
 import LikeComment from '../helpers/LikeComment';
 import CheckReportCom from '../helpers/CheckReportCom';
-import CheckReportAd from '../helpers/CheckReportedAd';
+import CheckReportAd from '../helpers/CheckAdReported';
 import './show.css';
 
 
@@ -21,6 +21,9 @@ function Show() {
     const [featured, setFeatured] = useState([])
     //bring latest ads (ordinary not featured)
     const [adsLatest, setAdsLatest] = useState([])
+    //check blocking
+    const [resultBlock, setResultBlock] = useState('')
+    const [resultBlockComms, setResultBlockComms] = useState('')
     //search
     const refCountry = useRef()
     const refState = useRef()
@@ -41,16 +44,13 @@ function Show() {
     const [loadingSearch, setLoadingSearch] = useState(false)
     const [loadingMore, setLoadingMore] = useState(false)
     const [searchWord, setSearchWord] = useState('')
-
     //loadMore
     const [currentPage, setCurrentPage] = useState(1)
     const [savedStatuses, setSavedStatuses] = useState({})
     const refLoadMoreBtn = useRef('')
-
     //enlarge image
     const [enlarge, setEnlarge] = useState('')
     const baseURL='http://127.0.0.1:8000/storage/images/';
-
    //check if ad is saved or not
    const checkSavedStatus = async (itemIds, userEmail) => {
         try {
@@ -423,19 +423,29 @@ async function getSubcats(id){ //id=cat_id
    setSubcats(res.data); 
 }
 
-//get country code for whatsapp
-/*const code=(name)=>{
-    if(name==1||name==='مصر'){return '20';} else  if(name==2||name==='السعودية'){return '9660';}
-    else  if(name==3||name==='الكويت'){return '9650';} else  if(name==4||name==='الامارات'){return '9710';}
-    else  if(name==5||name==='قطر'){return '9740';} else  if(name==6||name==='سلطنة عمان'){return '9680';}
-  }*/
-
-  
+  //check if user is prevented from adding ads
+const checkBlockingReporting=async()=>{
+    const more='reports'
+    const email=loginData&&loginData.email
+    const res=await http.post('/panel/check-user-block',{email,more})
+    //res.data.message=0 means not blocked from adding ads
+    res.data.more==='reports'&&setResultBlock(res.data.message)
+}
+  //check if user is prevented from commenting
+const checkBlockingComms=async()=>{
+    const more='comms'
+    const email=loginData&&loginData.email
+    const res=await http.post('/panel/check-user-block',{email,more})
+    //res.data.message=0 means not blocked from commenting 
+    res.data.more==='comms'&&setResultBlockComms(res.data.message)
+}
   //bring featured and latest ads and categories when page loads
 useEffect(() => {
     bringFeatured();
     bringLatest();
     getCats()
+    checkBlockingReporting()
+    checkBlockingComms()
 }, []) 
 
 
@@ -505,14 +515,19 @@ useEffect(() => {
                                                                     </span>
                                                                     {loginData 
                                                                         ?<>{/* when online user clicks on repoert icon */}
-                                                                          <span onClick={()=>{reportCom(e.c_id)}} title='تبليغ'>
-                                                                                {showReport /* show filled icon or unfilled icon */
-                                                                                ?showReport.ok==='ok'&&showReport.email===loginData.email&&showReport.cid===e.c_id
-                                                                                    ?<i className='bi bi-flag-fill pointer'></i>
-                                                                                    :<i className='bi bi-flag pointer'></i>
-                                                                                :<CheckReportCom cid={e.c_id} email={loginData.email} />
-                                                                                }
-                                                                          </span>
+                                                                            {resultBlock===0 //user not blocked
+                                                                                ?
+                                                                                    <span onClick={()=>{reportCom(e.c_id)}} title='تبليغ'>
+                                                                                            {showReport /* show filled icon or unfilled icon */
+                                                                                            ?showReport.ok==='ok'&&showReport.email===loginData.email&&showReport.cid===e.c_id
+                                                                                                ?<i className='bi bi-flag-fill pointer'></i>
+                                                                                                :<i className='bi bi-flag pointer'></i>
+                                                                                            :<CheckReportCom cid={e.c_id} email={loginData.email} />
+                                                                                            }
+                                                                                    </span>
+                                                                                  //user blocked
+                                                                                :<i title='محظور' className='bi bi-flag'></i>
+                                                                            }
                                                                          </>
                                                                         :<Link to='/login'><i title='تبليغ' className='bi bi-flag pointer'></i></Link>
                                                                     }
@@ -555,7 +570,7 @@ useEffect(() => {
                                                                 {/** show form to insert reply if clicked on reply icon */}    
                                                                 {loginData&&replyState>0&&replyState===e.c_id&& 
                                                                     <form onSubmit={(ev)=>{submitReply(ev,e)}} >
-                                                                        <input ref={ReplyT} type='text' className='border-secondary border-1 mx-auto w-100 rounded-3 d-block small p-1' placeholder='اكتب رد على التعليق' />
+                                                                       {resultBlockComms===0&& <input ref={ReplyT} type='text' className='border-secondary border-1 mx-auto w-100 rounded-3 d-block small p-1' placeholder='اكتب رد على التعليق' />}
                                                                     </form>
                                                                 }
                                                          </div>
@@ -570,20 +585,23 @@ useEffect(() => {
                                                <div className=''>
                                                     {/** owners of the ads cant comment but they can reply to comments */}
                                                     {isOwner
-                                                    ?<p>لا يمكن لصاحب اللافتة التعليق ولكن يمكنه الرد على التعليقات</p>
-                                                    :<>
-                                                        <div>
-                                                            <i className='bi bi-star text-warning' value='1' ref={rate1} onClick={()=>{rateFunc(1)}} ></i> <i className='bi bi-star mx-2' ref={rate2} onClick={()=>{rateFunc(2)}}></i> <i className='bi bi-star' ref={rate3} onClick={()=>{rateFunc(3)}} ></i>
-                                                            <i className='bi bi-star mx-2' ref={rate4} onClick={()=>{rateFunc(4)}} ></i> <i className='bi bi-star' ref={rate5} onClick={()=>{rateFunc(5)}} ></i>
-                                                        </div>
-                                                        <form onSubmit={(e)=>{insertComment(e,adData.item_id,adData.USER_ID)}} className='mt-3 '>
-                                                                <textarea ref={inputComment} placeholder='  اكتب تعليق على هذه اللافته' className='w-100 p-1 ms-1 ' ></textarea>
-                                                                <div className='d-flex'>
-                                                                    <button ref={refBtnSubmitComment} className='border-0 p-1 bg-success text-white'>أرسل</button>
-                                                                    <span className='me-2 align-self-center fs-4' ref={received}></span>
+                                                        ?<p>لا يمكن لصاحب اللافتة التعليق ولكن يمكنه الرد على التعليقات</p>
+                                                        :resultBlockComms===0
+                                                           ?
+                                                            <>
+                                                                <div>
+                                                                    <i className='bi bi-star text-warning' value='1' ref={rate1} onClick={()=>{rateFunc(1)}} ></i> <i className='bi bi-star mx-2' ref={rate2} onClick={()=>{rateFunc(2)}}></i> <i className='bi bi-star' ref={rate3} onClick={()=>{rateFunc(3)}} ></i>
+                                                                    <i className='bi bi-star mx-2' ref={rate4} onClick={()=>{rateFunc(4)}} ></i> <i className='bi bi-star' ref={rate5} onClick={()=>{rateFunc(5)}} ></i>
                                                                 </div>
-                                                        </form>
-                                                     </>
+                                                                <form onSubmit={(e)=>{insertComment(e,adData.item_id,adData.USER_ID)}} className='mt-3 '>
+                                                                        <textarea ref={inputComment} placeholder='  اكتب تعليق على هذه اللافته' className='w-100 p-1 ms-1 ' ></textarea>
+                                                                        <div className='d-flex'>
+                                                                            <button ref={refBtnSubmitComment} className='border-0 p-1 bg-success text-white'>أرسل</button>
+                                                                            <span className='me-2 align-self-center fs-4' ref={received}></span>
+                                                                        </div>
+                                                                </form>
+                                                            </>
+                                                            :<span className='text-danger'>محظور من التعليق لمخالفة سياسة الموقع</span>
                                                     }
                                                </div>
                                              :<Link to='/login'>سجل الدخول لاضافة تعليق</Link>
@@ -642,14 +660,19 @@ useEffect(() => {
                                                           {loginData ?  (<ShowSaved id={e.item_id} isSaved={savedStatuses[e.item_id] === 'saved'}/>) : (<Link title='حفظ' to='/login'><i className='bi bi-heart mx-2 align-self-center gray'></i></Link>) }
                                                           {/*report*/}
                                                           {loginData 
-                                                            ? <><span onClick={()=>{reportAd(e.item_id,loginData.email )}}>
-                                                                  {adReported
-                                                                    ?adReported.ok==='ok'&&adReported.item===e.item_id&&adReported.email===loginData.email
-                                                                        ?<i className='bi bi-flag-fill mt-1'></i>
-                                                                        :<i className='bi bi-flag mt-1'></i>
-                                                                    :<CheckReportAd item={e.item_id} email={loginData.email} />
-                                                                  }
-                                                               </span>
+                                                            ? <> 
+                                                               {resultBlock===0 /*user not blocked*/ 
+                                                                 ?
+                                                                    <span onClick={()=>{reportAd(e.item_id,loginData.email )}}>
+                                                                        {adReported
+                                                                            ?adReported.ok==='ok'&&adReported.item===e.item_id&&adReported.email===loginData.email
+                                                                                ?<i className='bi bi-flag-fill mt-1'></i>
+                                                                                :<i className='bi bi-flag mt-1'></i>
+                                                                            :<CheckReportAd item={e.item_id} email={loginData.email} />
+                                                                        }
+                                                                    </span>
+                                                                 :<i title='محظور' className='bi bi-flag mt-1'></i>
+                                                               }
                                                              </>
                                                             :<Link to='/login' ><i className='bi bi-flag mt-1'></i></Link>
                                                           }
@@ -698,17 +721,22 @@ useEffect(() => {
                                                     {/*report*/}
                                                     {loginData 
                                                         /*if logged in*/
-                                                        ? <><span onClick={()=>{reportAd(e.item_id,loginData.email )}}>
-                                                                {adReported
-                                                                ?adReported.ok==='ok'&&adReported.item===e.item_id&&adReported.email===loginData.email
-                                                                    ?<i className='bi bi-flag-fill mt-1'></i>
-                                                                    :<i className='bi bi-flag mt-1'></i>
-                                                                :<CheckReportAd item={e.item_id} email={loginData.email} />
-                                                                }
-                                                            </span>
+                                                        ? <>
+                                                           {resultBlock===0 /*user not blocked*/
+                                                             ?
+                                                                <span onClick={()=>{reportAd(e.item_id,loginData.email )}}>
+                                                                    {adReported
+                                                                    ?adReported.ok==='ok'&&adReported.item===e.item_id&&adReported.email===loginData.email
+                                                                        ?<i className='bi bi-flag-fill mt-1'></i>
+                                                                        :<i className='bi bi-flag mt-1'></i>
+                                                                    :<CheckReportAd item={e.item_id} email={loginData.email} />
+                                                                    }
+                                                                </span>
+                                                             :  <i title='محظور' className='bi bi-flag mt-1'></i>
+                                                            }
                                                             </>
                                                           /*if not logged in*/
-                                                        :<Link to='/login' ><i className='bi bi-flag mt-1'></i></Link>
+                                                         :<Link to='/login' ><i className='bi bi-flag mt-1'></i></Link>
                                                      }
                                                </div>
                                             </div>
@@ -837,14 +865,19 @@ useEffect(() => {
                                                             {loginData ?  (<ShowSaved id={e.item_id} isSaved={savedStatuses[e.item_id] === 'saved'}/>) : (<Link title='حفظ' to='/login'><i className='bi bi-heart mx-2 align-self-center gray'></i></Link>) }
                                                             {/*report*/}
                                                             {loginData 
-                                                                ? <><span onClick={()=>{reportAd(e.item_id,loginData.email )}}>
-                                                                        {adReported
-                                                                            ?adReported.ok==='ok'&&adReported.item===e.item_id&&adReported.email===loginData.email
-                                                                                ?<i className='bi bi-flag-fill mt-1'></i>
-                                                                                :<i className='bi bi-flag mt-1'></i>
-                                                                            :<CheckReportAd item={e.item_id} email={loginData.email} />
-                                                                        }
-                                                                    </span>
+                                                                ? <>
+                                                                  {resultBlock===0 /*user not blocked*/
+                                                                    ?
+                                                                        <span onClick={()=>{reportAd(e.item_id,loginData.email )}}>
+                                                                            {adReported
+                                                                                ?adReported.ok==='ok'&&adReported.item===e.item_id&&adReported.email===loginData.email
+                                                                                    ?<i className='bi bi-flag-fill mt-1'></i>
+                                                                                    :<i className='bi bi-flag mt-1'></i>
+                                                                                :<CheckReportAd item={e.item_id} email={loginData.email} />
+                                                                            }
+                                                                        </span>
+                                                                    :   <i title='محظور' className='bi bi-flag mt-1'></i>
+                                                                  }
                                                                   </>
                                                                 :<Link to='/login' ><i className='bi bi-flag mt-1'></i></Link>
                                                             }
